@@ -72,6 +72,7 @@ class UssdLogicController extends Controller
              *Check that the user actually typed something,
              *else demote level and start at home
              */
+            $username=User::where('phone_number',$this->phone_number)->pluck('username')->all();
 
             switch ($this->user_response){
                 case "" :
@@ -84,14 +85,32 @@ class UssdLogicController extends Controller
                         ]);
                         //Serve our services menu
 
+                        $this->response="Karibu $username,please choose a service";
+                        $this->response.="1.Send me today's voice tip\n";
+                        $this->response.="2.Please call me!\n";
+                        $this->response.="3.Send me airtime";
+
+                        // Print the response onto the page so that our gateway can read it
+                        header('Content-Type:text/plain');
+                        $this->ussd_proceed($this->response);
+                    }
+                    break;
+
+
+                case "1"    :
+
+                    if($this->level==2){
                         
                     }
+
             }
-
-
         }
-
-
+    }
+    public function ussd_proceed($proceed){
+        echo "CON $proceed";
+    }
+    public function ussd_finish($stop){
+        echo "END $stop";
     }
 
 
