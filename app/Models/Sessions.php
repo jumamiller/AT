@@ -13,5 +13,5 @@ class Sessions extends Model
         'phoneNumber',
         'level'
     ];
-    protected bool $timestamp=false;
+    public $timestamps=false;
 }
