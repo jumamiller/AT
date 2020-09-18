@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Sessions;
-
+use africastalking\SDK\africastalking;
 class UssdLogicController extends Controller
 {
     /**
@@ -16,6 +16,10 @@ class UssdLogicController extends Controller
     private $service_code;
     private $phone_number;
     private $text;
+
+    private $AT_username;
+    private $AT_apikey;
+    private $AT;//africastalking instance
 
     protected string $response;
     protected int $level;
@@ -35,6 +39,11 @@ class UssdLogicController extends Controller
             $this->phone_number =$request->get('phoneNumber');
             $this->text         =$request->get('text');
         }
+
+        $this->AT_apikey    =env('AT_API_KEY');
+        $this->AT_username  =env('AT_USERNAME');
+        $this->AT=new africastalking($this->AT_username,$this->AT_apikey);
+
         //initialise with default values
         $this->level    =0;
         $this->response ="";
@@ -99,8 +108,10 @@ class UssdLogicController extends Controller
 
                 case "1"    :
 
-                    if($this->level==2){
-                        
+                    if($this->level==1){
+                        // Send the user todays voice tip via AT SMS API
+
+
                     }
 
             }
