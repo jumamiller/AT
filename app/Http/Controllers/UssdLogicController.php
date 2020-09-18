@@ -216,8 +216,70 @@ class UssdLogicController extends Controller
 
                         case 2:
                             //request for city again
-                            
+                            $this->response="City not supposed to be empty. Please reply with your city \n";
+                            $this->header;
+                            $this->ussd_proceed($this->response);
+                            break;
+
+                        default:
+                            $this->response="Sorry,something went wrong\n";
+                            $this->header;
+                            $this->ussd_proceed($this->response);
+
                     }
+                }
+                else{
+                    //Update User table based on input to correct level
+                    switch ($this->level){
+                        //Serve the menu request for name
+                        case 0:
+                            $this->response="This level should not be seen...\n";
+                            $this->header;
+                            $this->ussd_finish($this->response);
+                            break;
+
+                        case 1:
+                            //Update Name, Request for city
+                            User::where('phone_number','like','%'.$this->phone_number.'%')->update(['username'=>$this->user_response]);
+                            //We graduate the user to the city level
+                            Sessions::where('session_id',$this->session_id)->update(['level'=>2]);
+
+                            //We request for the city
+                            $this->response="Please enter your city\n";
+                            $this->header;
+                            $this->ussd_proceed($this->response);
+                            break;
+
+                        case 2:
+                            //update city
+                            User::where('phone_number','like','%'.$this->phone_number.'%')->update(['city'=>$this->user_response]);
+
+                            //change level to 0
+
+                            Sessions::create([
+                                'session_id'    =>$this->session_id,
+                                'phoneNumber'   =>$this->phone_number,
+                                'level'         =>0
+                            ]);
+                            //service service menu;
+
+                            $this->response="Please choose a service\n";
+                            $this->response.="1.Send me today's voice tip\n";
+                            $this->response.="2.Please call me!\n";
+                            $this->response.="3.Send me airtime";
+
+                            $this->header;
+                            $this->ussd_proceed($this->response);
+                            break;
+
+                        default:
+                            //request for city again
+                            $this->response="Something went wrong\n";
+                            $this->header;
+                            $this->ussd_finish($this->response);
+                            break;
+                    }
+
                 }
 
 
