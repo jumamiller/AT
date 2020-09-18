@@ -10,7 +10,8 @@ class Sessions extends Model
     use HasFactory;
 
     protected $fillable = [
-        'phoneNumber',
+        'phone_number',
+        'session_id',
         'level'
     ];
     public $timestamps=false;

@@ -62,6 +62,7 @@ class UssdLogicController extends Controller
          * DB and retain default level if none
          * is found for this session
          */
+
         $level_query=Sessions:: where('session_id',$this->session_id)->pluck('level')->first();
         $level_query   ?   $this->level=$level_query    :   $this->level;
 
@@ -69,13 +70,14 @@ class UssdLogicController extends Controller
          * check if the user
          * is in the db
          */
-        $user=User::where('phone_number','like','%'.$this->phone_number.'%')
-                    ->get(['username','city']);
+
+        $user=User::where('phone_number',$this->phone_number)->get(['username','city']);
         /**
          * Check if the user is available (yes)->Serve the menu;
          * (no)->Register the user
          */
-        if($user){
+
+        if($user->count() > 0){
             /**
              *Serve the Services Menu
              *Check that the user actually typed something,
@@ -190,9 +192,11 @@ class UssdLogicController extends Controller
                  */
 
                 if($this->user_response==""){
+
                     switch ($this->level){
                         case 0:
                             //Graduate the user to the next level, so you dont serve them the same menu
+                            //$level=1;
                             Sessions::create([
                                 'session_id'    =>$this->session_id,
                                 'phone_number'  =>$this->phone_number,
@@ -240,7 +244,7 @@ class UssdLogicController extends Controller
 
                         case 1:
                             //Update Name, Request for city
-                            User::where('phone_number','like','%'.$this->phone_number.'%')->update(['username'=>$this->user_response]);
+                            User::where('phone_number',$this->phone_number)->update(['username'=>$this->user_response]);
                             //We graduate the user to the city level
                             Sessions::where('session_id',$this->session_id)->update(['level'=>2]);
 
@@ -252,7 +256,7 @@ class UssdLogicController extends Controller
 
                         case 2:
                             //update city
-                            User::where('phone_number','like','%'.$this->phone_number.'%')->update(['city'=>$this->user_response]);
+                            User::where('phone_number',$this->phone_number)->update(['city'=>$this->user_response]);
 
                             //change level to 0
 
@@ -281,9 +285,6 @@ class UssdLogicController extends Controller
                     }
 
                 }
-
-
-
         }
     }
     public function ussd_proceed($proceed){
@@ -292,14 +293,6 @@ class UssdLogicController extends Controller
     public function ussd_finish($stop){
         echo "END $stop";
     }
-
-
-
-
-
-
-
-
 
 
 
